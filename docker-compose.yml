@@ -1,0 +1,15 @@
+services:
+  paper-llama:
+    build: .
+    container_name: paper-llama
+    restart: unless-stopped
+    environment:
+      - PAPERLESS_URL=${PAPERLESS_URL}
+      - PAPERLESS_TOKEN=${PAPERLESS_TOKEN}
+      - OLLAMA_URL=${OLLAMA_URL}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - SCAN_INTERVAL=${SCAN_INTERVAL}
+      - OVERRIDE_EXISTING_TAGS=${OVERRIDE_EXISTING_TAGS}
+      - LOG_LEVEL=${LOG_LEVEL}
+    volumes:
+      - ./prompt.txt:/app/prompt.txt:ro
