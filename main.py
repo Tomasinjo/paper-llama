@@ -22,7 +22,7 @@ def process_single_document(doc_id: int, p_client: PaperlessClient, o_client: Ol
         if dry_run:
             logger.info("Not updating document due to dry run")
             return
-
+        p_client.refresh_metadata()
         p_client.update_document(doc, llm_result)
 
     except Exception as e:
@@ -33,6 +33,8 @@ def run_auto_mode(p_client: PaperlessClient, o_client: OllamaClient, dry_run: bo
     """Continuous loop for docker usage"""
     logger.info(f"Starting automatic mode (Interval: {settings.scan_interval}s)")
     
+    p_client.refresh_metadata()
+
     while True:
         try:
             docs = p_client.get_documents_to_process()

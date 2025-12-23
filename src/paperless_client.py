@@ -18,10 +18,10 @@ class PaperlessClient:
         self._types_map: Dict[str, int] = {}
         self._processed_cf_id: int = 0
         
-        self._refresh_metadata()
 
-    def _refresh_metadata(self):
+    def refresh_metadata(self):
         """Fetch all metadata to map names to IDs."""
+        logger.info("Loading metadata, this can take a minute or more..")
         self._tags_map = self._fetch_all_pages("tags")
         self._correspondents_map = self._fetch_all_pages("correspondents")
         self._types_map = self._fetch_all_pages("document_types")
@@ -133,8 +133,14 @@ class PaperlessClient:
         for item in data['results']:
             if (id_ := item.get('id')) and item.get('data_type') == 'boolean':
                 return id_
-        print(data)
-        raise NotImplementedError("Required custom field of type boolean does not exist. Please read the instrcutions in readme.md")
+        logger.warning("Custom field AI Processed was not found, will be created..")
+        self._create_custom_field("AI Processed", "boolean")
+        return self._get_ai_processed_cf_id()
+
+    def _create_custom_field(self, name: str, data_type: str):
+        url = f"{self.base_url}/api/custom_fields/"
+        resp = requests.post(url, headers=self.headers, json={"name": name, "data_type": data_type})
+        resp.raise_for_status()
 
     def update_document(self, doc: PaperlessDocument, llm_data: Any):
         """
