@@ -31,6 +31,10 @@ OLLAMA_MODEL=gemma3:27b-32k
 <br>
 
 3. Check it works. Go to your paperless-ngx and open any document. In URL, there is document ID. Add it to `--doc-id` flag. The flag `--dry-run` will not modify documents on your paperless-ngx, but only log LLM response:
+
+`python3 main.py --mode manual --doc-id 127 --dry-run` 
+
+Example output:
 ```
 (venv) tom @ server ~/apps/paperless/paper-llama $ python3 main.py --mode manual --doc-id 127 --dry-run
 2025-12-23 21:13:57,827 - PaperlessAI - INFO - Loaded metadata: 152 tags, 78 correspondents.
