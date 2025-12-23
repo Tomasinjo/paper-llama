@@ -1,6 +1,6 @@
 services:
   paper-llama:
-    build: .
+    image: ghcr.io/tomasinjo/paper-llama:main
     container_name: paper-llama
     restart: unless-stopped
     environment:
