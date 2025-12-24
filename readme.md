@@ -30,7 +30,7 @@ OLLAMA_MODEL=gemma3:27b-32k
 
 <br>
 
-3. Check it works. Go to your paperless-ngx and open any document. In URL, there is document ID. Add it to `--doc-id` flag. The flag `--dry-run` will not modify documents on your paperless-ngx, but only log LLM response:
+3. Check if it works. Go to your paperless-ngx and open any document. In URL, there is document ID. Add it to `--doc-id` flag. The flag `--dry-run` will not modify documents on your paperless-ngx, but only log LLM response:
 
 `python3 main.py --mode manual --doc-id 127 --dry-run` 
 
