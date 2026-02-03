@@ -3,6 +3,7 @@ services:
     image: ghcr.io/tomasinjo/paper-llama:main
     container_name: paper-llama
     restart: unless-stopped
+    command: ["python", "main.py", "--mode", "auto"]
     environment:
       - PAPERLESS_URL=${PAPERLESS_URL}
       - PAPERLESS_TOKEN=${PAPERLESS_TOKEN}
@@ -11,5 +12,8 @@ services:
       - SCAN_INTERVAL=${SCAN_INTERVAL}
       - OVERRIDE_EXISTING_TAGS=${OVERRIDE_EXISTING_TAGS}
       - LOG_LEVEL=${LOG_LEVEL}
+      - OCR_SOURCE=${OCR_SOURCE}
+      - LLM_OCR_SOURCE_PAGE_LIMIT=${LLM_OCR_SOURCE_PAGE_LIMIT}
+
     volumes:
       - ./prompt.txt:/app/prompt.txt:ro

@@ -7,7 +7,7 @@ The JSON object must follow this structure (keys can be null if not found):
     "title": "A concise title for the document in Slovenian",
     "created": "YYYY-MM-DD",
     "correspondent": Name of company or institution without "d.o.o." "s.p." "d.d." appendix, use same upper case as in document,
-    "document_type": Can only be one of %TYPES%,
+    "document_type": Can only be one of %TYPES% single string,
     "tags": array of tags. Add one in slovenian, capitalize first letter that summarizes the document and one or more of person if present in document "Name Surname 1", "Name Surnamee 2", "Name Surname 3"
 }
 OCR CONTENT:

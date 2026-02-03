@@ -8,18 +8,8 @@ There are similar projects out there, but I find them too bloated. This program 
 
 While you can use docker for running it against new documents, you should start with the following test to design the prompt.
 
-1. Clone the project, create a virtual environment and install dependencies:
-```
-git clone git@github.com:Tomasinjo/paper-llama.git
-cd paper-llama
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
 
-<br>
-
-2. Edit .env and modify access data for paperless-ngx and ollama:
+1. Edit .env and modify access data for paperless-ngx and ollama:
 ```
 PAPERLESS_URL=http://paperless_app:8000
 PAPERLESS_TOKEN=0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxab68
@@ -28,27 +18,44 @@ OLLAMA_URL=http://ollama:11434
 OLLAMA_MODEL=gemma3:27b-32k
 ```
 
+To use LLM for OCR extraction, set the following variables:
+```
+# either paperless or llm
+OCR_SOURCE=llm
+
+# Applicable when "OCR_SOURCE=llm". If document has more pages, paperless OCR will be used
+LLM_OCR_SOURCE_PAGE_LIMIT=20
+```
+
+> [!IMPORTANT]
+> For OCR you must use vision capable model such as gemma3:27b
+
 <br>
 
-3. Check if it works. Go to your paperless-ngx and open any document. In URL, there is document ID. Add it to `--doc-id` flag. The flag `--dry-run` will not modify documents on your paperless-ngx, but only log LLM response:
+2. Check if it works. Go to your paperless-ngx and open any document. In URL, there is document ID. Add it to `--doc-id` flag. The flag `--dry-run` will not modify documents on your paperless-ngx, but only log LLM response:
 
-`python3 main.py --mode manual --doc-id 127 --dry-run` 
+```
+docker run --rm --env-file .env \
+  -v ./prompt.txt:/app/prompt.txt:ro \
+  ghcr.io/tomasinjo/paper-llama:main \
+  python main.py --mode manual --doc-id 127 --dry-run
+```
 
 Example output:
 ```
 (venv) tom @ server ~/apps/paperless/paper-llama $ python3 main.py --mode manual --doc-id 127 --dry-run
-2025-12-23 21:13:57,827 - PaperlessAI - INFO - Loaded metadata: 152 tags, 78 correspondents.
-2025-12-23 21:13:57,827 - PaperlessAI - INFO - Found the following variables to replace in prompt: ['%TYPES%']
-2025-12-23 21:14:01,013 - PaperlessAI - INFO - Processing Document 127: 'scan_001'
-2025-12-23 21:14:05,309 - PaperlessAI - INFO - Received response from Ollama
-2025-12-23 21:14:05,309 - PaperlessAI - INFO - LLM Suggestions: {"title":"Splošna privolitev in pogodbeni pogoji","created":"2024-04-04","correspondent":"RandomCorp","document_type":"contract","tags":["Privolitev","Tom Kern","Name Surname"]}
-2025-12-23 21:14:05,309 - PaperlessAI - INFO - Not updating document due to dry run
+2025-12-23 21:13:57,827 - paper-llama - INFO - Loaded metadata: 152 tags, 78 correspondents.
+2025-12-23 21:13:57,827 - paper-llama - INFO - Found the following variables to replace in prompt: ['%TYPES%']
+2025-12-23 21:14:01,013 - paper-llama - INFO - Processing Document 127: 'scan_001'
+2025-12-23 21:14:05,309 - paper-llama - INFO - Received response from Ollama
+2025-12-23 21:14:05,309 - paper-llama - INFO - LLM Suggestions: {"title":"Splošna privolitev in pogodbeni pogoji","created":"2024-04-04","correspondent":"RandomCorp","document_type":"contract","tags":["Privolitev","Tom Kern","Name Surname"]}
+2025-12-23 21:14:05,309 - paper-llama - INFO - Not updating document due to dry run
 ```
 If you don't get any connection errors, you can proceed, else fix the URLs.
 
 <br>
 
-4. Read section [About prompt](#About-prompt) below, modify the file `prompt.txt` and run with `--dry-run` until you are satisfied with the result. You can also remove `--dry-run` to see if document in paperless-ngx is updated correctly.
+3. Read section [About prompt](#About-prompt) below, modify the file `prompt.txt` and run with `--dry-run` until you are satisfied with the result. You can also remove `--dry-run` to see if document in paperless-ngx is updated correctly.
 
 Proceed by scheduling it to run periodically. You can run it as script on host using flags `--mode auto`, or even better, [with docker compose](##Deploying-in-docker).
 
@@ -67,7 +74,7 @@ Feel free to modify the prompt, but please note that paper-llama expects JSON re
     "tags": array
 }
 ```
-It is OK if you decide to remove some keys, or if LLM responds with `null` value - it will simply be ignored from document update.
+It is OK if you decide to remove some keys, or if LLM responds with `null` value - they will simply be ignored from document update.
 
 You can use variables which are replaced by actual values from paperless-ngx. Possible variables:
 

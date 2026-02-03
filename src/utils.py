@@ -1,6 +1,8 @@
 import logging
 import json
 import re
+from PIL import Image
+from pdf2image import convert_from_bytes
 from src.config import settings
 
 def setup_logging():
@@ -12,7 +14,7 @@ def setup_logging():
             logging.StreamHandler()
         ]
     )
-    return logging.getLogger("PaperlessAI")
+    return logging.getLogger("paper-llama")
 
 logger = setup_logging()
 
@@ -69,3 +71,10 @@ def get_user_prompt(p_client):
                 json.dumps(list(p_client._correspondents_map.keys()))
             )
     return user_prompt_template
+
+
+def pdf_to_images(pdf_bytes: bytes) -> list[Image.Image]:
+    logger.info("Converting PDF to images for OCR...")
+    images = convert_from_bytes(pdf_bytes)
+    logger.info(f"Converted PDF to {len(images)} page(s)")
+    return images

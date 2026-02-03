@@ -47,6 +47,47 @@ class PaperlessClient:
         resp.raise_for_status()
         return PaperlessDocument(**resp.json())
 
+    def get_original_pdf(self, doc_id: int) -> bytes:
+        """
+        Retrieve the original PDF file for a document.
+        
+        Args:
+            doc_id: The document ID
+            
+        Returns:
+            The PDF file content as bytes
+        """
+        resp = requests.get(
+            f"{self.base_url}/api/documents/{doc_id}/download/",
+            headers=self.headers
+        )
+        resp.raise_for_status()
+        return resp.content
+
+    def send_ocr(self, doc_id: int, ocr_text: str) -> bool:
+        """
+        Send OCR text to Paperless for a document.
+        
+        Args:
+            doc_id: The document ID
+            ocr_text: The OCR text content to send
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        resp = requests.patch(
+            f"{self.base_url}/api/documents/{doc_id}/",
+            headers=self.headers,
+            json={"content": ocr_text, "id": doc_id}
+        )
+        try:
+            resp.raise_for_status()
+            logger.info(f"Successfully sent OCR for Document {doc_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send OCR for document {doc_id}: {resp.text}")
+            return False
+
     def get_documents_to_process(self) -> List[PaperlessDocument]:
         """Fetch documents that do NOT have the AI Processed custom field or is false"""
         params = {

@@ -2,3 +2,5 @@ requests>=2.31.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 python-dotenv>=1.0.0
+pdf2image>=1.17.0
+Pillow>=10.0.0
