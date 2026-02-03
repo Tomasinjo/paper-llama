@@ -97,7 +97,7 @@ After you fine-tuned your prompt, you can deploy it in docker where paper-llama 
 
 1. Put files `docker-compose.yml`, `prompt.txt` and `.env` in a new directory.
 2. Modify `.env`:
-    - `OVERRIDE_EXISTING_TAGS=True`  --> controls if existing tags can be replaced with those provided by LLM. If set to False, the LLM tags will be added alongside the existing tags in paperless-ngx.
+    - `OVERRIDE_EXISTING_TAGS=True`  --> controls if existing tags should be replaced with those provided by LLM. If set to False, the LLM tags will be added alongside the existing document tags in paperless-ngx.
     - `SCAN_INTERVAL=600`  --> How often to check for new documents in seconds
 3. Deploy it: `docker-compose up -d`
 4. Check the logs: `docker compose logs -fn 50`

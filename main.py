@@ -8,7 +8,11 @@ from src.utils import logger, get_user_prompt, pdf_to_images
 
 
 
-def process_single_document(doc_id: int, p_client: PaperlessClient, o_client: OllamaClient, dry_run: bool):
+def process_single_document(doc_id: int, 
+                            prompt: str, 
+                            p_client: PaperlessClient, 
+                            o_client: OllamaClient, 
+                            dry_run: bool):
     try:
         logger.info(f"Processing Document {doc_id}")
         
@@ -27,15 +31,13 @@ def process_single_document(doc_id: int, p_client: PaperlessClient, o_client: Ol
             ocr_text = doc.content
 
         # Process the OCR text with LLM for classification
-        llm_result = o_client.process_document(ocr_text)
+        llm_result = o_client.process_document(prompt, ocr_text)
         logger.info(f"LLM Suggestions: {llm_result.model_dump_json()}")
         
         if dry_run:
             logger.warning("Not updating document due to dry run")
             return
         
-        # Get document metadata for update
-        p_client.refresh_metadata()
         logger.info(f"Updating Document {doc.id}: '{doc.title}'")
         p_client.send_ocr(doc_id, ocr_text)
         p_client.update_document(doc, llm_result)
@@ -48,8 +50,6 @@ def run_auto_mode(p_client: PaperlessClient, o_client: OllamaClient, dry_run: bo
     """Continuous loop for docker usage"""
     logger.info(f"Starting automatic mode (Interval: {settings.scan_interval}s)")
     
-    p_client.refresh_metadata()
-
     while True:
         try:
             docs = p_client.get_documents_to_process()
@@ -58,8 +58,10 @@ def run_auto_mode(p_client: PaperlessClient, o_client: OllamaClient, dry_run: bo
                 logger.info("No new documents found.")
             else:
                 logger.info(f"Found {len(docs)} documents to process.")
+                p_client.refresh_metadata()
+                prompt = get_user_prompt(p_client)
                 for doc in docs:
-                    process_single_document(doc.id, p_client, o_client, dry_run)
+                    process_single_document(doc.id, prompt, p_client, o_client, dry_run)
         
         except Exception as e:
             logger.error(f"Error in auto loop: {e}")
@@ -78,7 +80,7 @@ def run():
 
     try:
         p_client = PaperlessClient()
-        o_client = OllamaClient(user_prompt=get_user_prompt(p_client))
+        o_client = OllamaClient()
     except Exception as e:
         logger.critical(f"Initialization failed: {e}")
         sys.exit(1)
@@ -89,7 +91,9 @@ def run():
         if not args.doc_id:
             logger.error("Manual mode requires --doc-id")
             sys.exit(1)
-        process_single_document(args.doc_id, p_client, o_client, args.dry_run)
+        p_client.refresh_metadata()
+        prompt = get_user_prompt(p_client)
+        process_single_document(args.doc_id, prompt, p_client, o_client, args.dry_run)
         
     elif args.mode == "auto":
         run_auto_mode(p_client, o_client, args.dry_run)

@@ -9,16 +9,14 @@ from src.utils import logger, extract_json_from_text
 from src.models import LLMResponse
 
 class OllamaClient:
-    def __init__(self, user_prompt):
+    def __init__(self):
         self.base_url = settings.ollama_url
         self.model = settings.ollama_model
-        self.user_prompt = user_prompt
-        logger.debug(f"User prompt is:\n\n{user_prompt}")
 
-    def process_document(self, ocr_text: str) -> LLMResponse:
-        full_prompt = f"{self.user_prompt}\n\n{ocr_text[:64000]}" # Truncate to avoid context limits if necessary
+    def process_document(self, prompt: str, ocr_text: str) -> LLMResponse:
+        full_prompt = f"{prompt}\n\n{ocr_text[:64000]}" # Truncate to avoid context limits if necessary
 
-        logger.debug(f"Sending prompt to Ollama (len={len(full_prompt)})")
+        logger.debug(f"Sending prompt to Ollama:\n{full_prompt[:1000]}")
         
         try:
             response = requests.post(
