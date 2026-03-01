@@ -8,10 +8,10 @@ RUN apt-get update && apt-get install -y poppler-utils && rm -rf /var/lib/apt/li
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/ ./src/
-COPY main.py .
-COPY prompt.txt .
+COPY --chown=1000:0 src/ ./src/
+COPY --chown=1000:0 main.py .
+COPY --chown=1000:0 prompt.txt .
 
-RUN chgrp -R 0 /app && \
-    chmod -R g=u /app
+RUN chmod -R g+w /app
+
 USER 1000
