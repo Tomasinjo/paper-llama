@@ -3,7 +3,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y poppler-utils && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-RUN chown 1000:0 /app && chmod 775 /app
+RUN chown 1000:0 /app && chmod 777 /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
