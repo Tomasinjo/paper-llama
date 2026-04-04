@@ -18,6 +18,9 @@ class Settings(BaseSettings):
 
     scan_interval: int = 600  # seconds, default 10 minuts
     
+    webhook_host: str = "0.0.0.0"
+    webhook_port: int = 8000
+    
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 settings = Settings()
