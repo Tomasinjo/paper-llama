@@ -19,14 +19,18 @@ class OllamaClient:
         logger.debug(f"Sending prompt to Ollama:\n{full_prompt[:1000]}")
         
         try:
+            payload = {
+                "model": self.model,
+                "prompt": full_prompt,
+                "stream": False,
+                "format": "json"
+            }
+            if settings.ollama_num_ctx:
+                payload["options"] = {"num_ctx": settings.ollama_num_ctx}
+
             response = requests.post(
                 f"{self.base_url}/api/generate",
-                json={
-                    "model": self.model,
-                    "prompt": full_prompt,
-                    "stream": False,
-                    "format": "json" # Force json mode if model supports it
-                },
+                json=payload,
                 timeout=120
             )
             response.raise_for_status()
@@ -65,14 +69,18 @@ class OllamaClient:
             
             # Send to Ollama for OCR
             try:
+                payload = {
+                    "model": self.model,
+                    "prompt": "Extract all text from this image. Return only the text content without any additional commentary.",
+                    "images": [img_base64],
+                    "stream": False
+                }
+                if settings.ollama_num_ctx:
+                    payload["options"] = {"num_ctx": settings.ollama_num_ctx}
+
                 response = requests.post(
                     f"{self.base_url}/api/generate",
-                    json={
-                        "model": self.model,
-                        "prompt": "Extract all text from this image. Return only the text content without any additional commentary.",
-                        "images": [img_base64],
-                        "stream": False
-                    },
+                    json=payload,
                     timeout=120
                 )
                 response.raise_for_status()
