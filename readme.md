@@ -16,6 +16,7 @@ PAPERLESS_TOKEN=0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxab68
 
 OLLAMA_URL=http://ollama:11434
 OLLAMA_MODEL=gemma3:27b-32k
+OLLAMA_NUM_CTX=32768
 ```
 
 To use LLM for OCR extraction, set the following variables:
@@ -89,7 +90,7 @@ You can find my prompt in [prompt.txt](prompt.txt).
 
 You can use any model supported by ollama and of course your hardware. Model gemma3:27b works great for me and consumes around 19GB of memory.
 
-[Don't forget to extend context token limit in ollama when deploying the model. By default it is only 2048, which is too low for larger documents](https://docs.ollama.com/faq#how-can-i-specify-the-context-window-size)
+By default, the context window size is set to 2048, which might be too low for larger documents. You can increase it by setting the `OLLAMA_NUM_CTX` environment variable.
 
 ## Deploying in docker
 
@@ -99,6 +100,7 @@ After you fine-tuned your prompt, you can deploy it in docker where paper-llama 
 2. Modify `.env`:
     - `OVERRIDE_EXISTING_TAGS=True`  --> controls if existing tags should be replaced with those provided by LLM. If set to False, the LLM tags will be added alongside the existing document tags in paperless-ngx.
     - `SCAN_INTERVAL=600`  --> How often to check for new documents in seconds
+    - `OLLAMA_NUM_CTX=32768`  --> (Optional) Ollama context window size. Default is 2048.
 3. Deploy it: `docker-compose up -d`
 4. Check the logs: `docker compose logs -fn 50`
 
