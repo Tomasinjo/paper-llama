@@ -8,6 +8,16 @@ from src.config import settings
 from src.utils import logger, extract_json_from_text
 from src.models import LLMResponse
 
+
+def build_ollama_options() -> dict[str, int | float | bool]:
+    options = {
+        "num_ctx": settings.ollama_num_ctx,
+        "temperature": settings.ollama_temperature,
+    }
+    options = {key: value for key, value in options.items() if value is not None}
+    return options
+
+
 class OllamaClient:
     def __init__(self):
         self.base_url = settings.ollama_url
@@ -19,15 +29,17 @@ class OllamaClient:
         logger.debug(f"Sending prompt to Ollama:\n{full_prompt[:1000]}")
         
         try:
+            options = build_ollama_options()
             payload = {
                 "model": self.model,
                 "prompt": full_prompt,
                 "stream": False,
                 "format": "json"
             }
-            if settings.ollama_num_ctx:
-                payload["options"] = {"num_ctx": settings.ollama_num_ctx}
-
+            if options:
+                payload["options"] = options
+            if settings.ollama_think is not None:
+                payload["think"] = settings.ollama_think
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json=payload,
@@ -69,15 +81,17 @@ class OllamaClient:
             
             # Send to Ollama for OCR
             try:
+                options = build_ollama_options()
                 payload = {
                     "model": self.model,
                     "prompt": "Extract all text from this image. Return only the text content without any additional commentary.",
                     "images": [img_base64],
-                    "stream": False
+                    "stream": False,
                 }
-                if settings.ollama_num_ctx:
-                    payload["options"] = {"num_ctx": settings.ollama_num_ctx}
-
+                if options:
+                    payload["options"] = options
+                if settings.ollama_think is not None:
+                    payload["think"] = settings.ollama_think
                 response = requests.post(
                     f"{self.base_url}/api/generate",
                     json=payload,

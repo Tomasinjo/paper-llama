@@ -119,6 +119,8 @@ After you fine-tuned your prompt, you can deploy it in docker where paper-llama 
     - `OVERRIDE_EXISTING_TAGS=True`  --> controls if existing tags should be replaced with those provided by LLM. If set to False, the LLM tags will be added alongside the existing document tags in paperless-ngx.
     - `SCAN_INTERVAL=600`  --> How often to check for new documents in seconds
     - `OLLAMA_NUM_CTX=32768`  --> (Optional) Ollama context window size. Default is 2048.
+    - `OLLAMA_THINK=False`    --> (Optional) Enable chain-of-thought (slower but more accurate), can be problematic on lower end hardware with limited context window size
+    - `OLLAMA_TEMPERATURE=0.2` --> (Optional) Lower = more deterministic output
 3. Deploy it: `docker-compose up -d`
 4. Check the logs: `docker compose logs -fn 50`
 
