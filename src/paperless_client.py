@@ -10,7 +10,7 @@ class PaperlessClient:
         self.base_url = settings.paperless_url.rstrip('/')
         self.headers = {
             "Authorization": f"Token {settings.paperless_token}",
-            "Accept": "application/json; version=2"
+            "Accept": "application/json; version=10"
         }
 
         self._tags_map: Dict[str, int] = {} 
